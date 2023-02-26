@@ -260,14 +260,14 @@ def convert_to_page_render_jobs(*, source_code_stats: List[SourceCodeStat], mark
         if documentation_ofs is not None:
             # documentation_of がリストのときも対応する
             titles = front_matter.get(FrontMatterItem.title.value)
-            if type(documentation_ofs) is str:
-                if type(titles) is not str:
+            if isinstance(documentation_ofs, str):
+                if not isinstance(titles, str):
                     logger.warning('the title of %s must be str: %s', str(path), str(titles))
                     continue
                 front_matter[FrontMatterItem.documentation_of.value] = documentation_ofs = [documentation_ofs]
                 front_matter[FrontMatterItem.title.value] = titles = [titles]
-            if type(documentation_ofs) is not list or \
-               type(titles) is not list or \
+            if (not isinstance(documentation_ofs, list)) or \
+               (not isinstance(titles, list)) or \
                len(documentation_ofs) != len(titles):
                 logger.warning('`title` and `documentation_of` do not match: %s, %s', str(titles), str(documentation_ofs))
                 continue
