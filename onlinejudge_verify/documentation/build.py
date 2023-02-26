@@ -35,6 +35,32 @@ _COPIED_STATIC_FILE_PATHS: List[str] = [
     'Gemfile',
 ]
 
+_CATEGORIES: List[Tuple[str, str]] = [
+    ('include/emthrm/data_structure', 'dataStructure'),
+    ('include/emthrm/data_structure/fenwick_tree', 'fenwickTree'),
+    ('include/emthrm/data_structure/union-find', 'unionFind'),
+    ('include/emthrm/dynamic_programming', 'dynamicProgramming'),
+    ('include/emthrm/game', 'game'),
+    ('include/emthrm/geometry', 'geometry'),
+    ('include/emthrm/graph', 'graph'),
+    ('include/emthrm/graph/flow/matching', 'matching'),
+    ('include/emthrm/graph/flow/maximum_flow', 'maximumFlow'),
+    ('include/emthrm/graph/flow/minimum_cost_flow', 'minimumCostFlow'),
+    ('include/emthrm/graph/shortest_path', 'shortestPath'),
+    ('include/emthrm/graph/tree', 'tree'),
+    ('include/emthrm/math', 'math'),
+    ('include/emthrm/math/convolution', 'convolution'),
+    ('include/emthrm/math/formal_power_series', 'formalPowerSeries'),
+    ('include/emthrm/math/matrix', 'matrix'),
+    ('include/emthrm/math/matrix/binary_matrix', 'binaryMatrix'),
+    ('include/emthrm/math/twelvefold_way', 'twelvefoldWay'),
+    ('include/emthrm/math/twelvefold_way/bell_number', 'bellNumber'),
+    ('include/emthrm/math/twelvefold_way/stirling_number', 'stirlingNumber'),
+    ('include/emthrm/misc', 'misc'),
+    ('include/emthrm/string', 'string'),
+    ('include/emthrm/util', 'util'),
+]
+
 
 def _build_page_title_dict(*, page_render_jobs: List[PageRenderJob]) -> Dict[pathlib.Path, str]:
     page_title_dict: Dict[pathlib.Path, str] = {}
@@ -122,34 +148,28 @@ def _render_source_code_stats_for_top_page(
     basedir: pathlib.Path,
 ) -> Dict[str, Any]:
     library_categories: Dict[str, List[Dict[str, str]]] = {}
-    verification_categories: Dict[str, List[Dict[str, str]]] = {}
+    verification_pages: List[Dict[str, str]] = []
     for stat in source_code_stats:
         if utils.is_verification_file(stat.path, basedir=basedir):
-            categories = verification_categories
+            verification_pages.append({
+                'path': str(stat.path),
+                'title': page_title_dict[stat.path],
+                'icon': _get_verification_status_icon(stat.verification_status),
+            })
         else:
-            categories = library_categories
-        category = str(stat.path.parent)
-        if category not in categories:
-            categories[category] = []
-        categories[category].append({
-            'path': str(stat.path),
-            'title': page_title_dict[stat.path],
-            'icon': _get_verification_status_icon(stat.verification_status),
-        })
+            category = str(stat.path.parent)
+            if category not in library_categories:
+                library_categories[category] = []
+            library_categories[category].append({
+                'path': str(stat.path),
+                'title': page_title_dict[stat.path],
+                'icon': _get_verification_status_icon(stat.verification_status),
+            })
 
     data: Dict[str, Any] = {}
-    data['libraryCategories'] = []
-    for category, pages in library_categories.items():
-        data['libraryCategories'].append({
-            'name': category,
-            'pages': pages,
-        })
-    data['verificationCategories'] = []
-    for category, pages in verification_categories.items():
-        data['verificationCategories'].append({
-            'name': category,
-            'pages': pages,
-        })
+    for path_category, category in _CATEGORIES:
+        data[category] = library_categories.get(path_category)
+    data['verificationPages'] = verification_pages
     return data
 
 

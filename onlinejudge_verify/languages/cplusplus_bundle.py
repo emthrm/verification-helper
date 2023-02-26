@@ -394,6 +394,8 @@ class Bundler:
                 matched = re.match(rb'\s*#\s*include\s*"(.*)"\s*', uncommented_line)
                 if matched:
                     included = matched.group(1).decode()
+                    if included.startswith('emthrm/'):
+                        included = 'include/' + included
                     logger.debug('%s: line %s: #include "%s"', str(path), i + 1, included)
                     if not is_toplevel:
                         # #if の中から #include されると #pragma once 系の判断が不可能になるので諦める

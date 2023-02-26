@@ -27,16 +27,21 @@ class TestDocsSubcommand(unittest.TestCase):
         random_absolute_hpp = get_random_string()
         random_unsupported_absolute_hpp = get_random_string()
         random_no_document_hpp = get_random_string()
+        random_multiple_pathes1_hpp = get_random_string()
+        random_multiple_pathes2_hpp = get_random_string()
         random_relative_md = get_random_string()
         random_absolute_md = get_random_string()
         random_unsupported_absolute_md = get_random_string()
         random_standalone_page_md = get_random_string()
+        random_multiple_pathes_md = get_random_string()
 
         files = {
             pathlib.Path('src', 'a', 'b', 'relative.hpp'): random_relative_hpp.encode(),
             pathlib.Path('src', 'a', 'b', 'absolute.hpp'): random_absolute_hpp.encode(),
             pathlib.Path('src', 'a', 'b', 'unsupported-absolute.hpp'): random_unsupported_absolute_hpp.encode(),
             pathlib.Path('src', 'a', 'b', 'no-document.hpp'): random_no_document_hpp.encode(),
+            pathlib.Path('src', 'a', 'b', 'multiple-pathes1.hpp'): random_multiple_pathes1_hpp.encode(),
+            pathlib.Path('src', 'a', 'b', 'multiple-pathes2.hpp'): random_multiple_pathes2_hpp.encode(),
             pathlib.Path('docs', 'x', 'y', 'relative.md'): textwrap.dedent(f"""\
                 ---
                 title: relative.md
@@ -68,6 +73,20 @@ class TestDocsSubcommand(unittest.TestCase):
 
                 {random_standalone_page_md}
                 """).encode(),
+            pathlib.Path('docs', 'x', 'y', 'multiple-pathes.md'): textwrap.dedent(f"""\
+                ---
+                title: [
+                  multiple pathes 1,
+                  multiple pathes 2
+                ]
+                documentation_of: [
+                  //src/a/b/multiple-pathes1.hpp,
+                  //src/a/b/multiple-pathes2.hpp
+                ]
+                ---
+
+                {random_multiple_pathes_md}
+                """).encode(),
         }
 
         destination_dir = pathlib.Path('.verify-helper', 'markdown')
@@ -77,6 +96,8 @@ class TestDocsSubcommand(unittest.TestCase):
             destination_dir / 'src' / 'a' / 'b' / 'unsupported-absolute.hpp.md': [random_unsupported_absolute_hpp, random_unsupported_absolute_md],
             destination_dir / 'src' / 'a' / 'b' / 'no-document.hpp.md': [random_no_document_hpp],
             destination_dir / 'docs' / 'x' / 'y' / 'standalone-page.md': [random_standalone_page_md],
+            destination_dir / 'src' / 'a' / 'b' / 'multiple-pathes1.hpp.md': [random_multiple_pathes1_hpp, random_multiple_pathes_md],
+            destination_dir / 'src' / 'a' / 'b' / 'multiple-pathes2.hpp.md': [random_multiple_pathes2_hpp, random_multiple_pathes_md],
         }
 
         with utils.load_files_pathlib(files) as tempdir:
