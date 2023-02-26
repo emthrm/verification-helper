@@ -122,20 +122,23 @@ def _render_source_code_stats_for_top_page(
     basedir: pathlib.Path,
 ) -> Dict[str, Any]:
     library_categories: Dict[str, List[Dict[str, str]]] = {}
-    verification_categories: Dict[str, List[Dict[str, str]]] = {}
+    verification_pages: List[Dict[str, str]] = []
     for stat in source_code_stats:
         if utils.is_verification_file(stat.path, basedir=basedir):
-            categories = verification_categories
+            verification_pages.append({
+                'path': str(stat.path),
+                'title': page_title_dict[stat.path],
+                'icon': _get_verification_status_icon(stat.verification_status),
+            })
         else:
-            categories = library_categories
-        category = str(stat.path.parent)
-        if category not in categories:
-            categories[category] = []
-        categories[category].append({
-            'path': str(stat.path),
-            'title': page_title_dict[stat.path],
-            'icon': _get_verification_status_icon(stat.verification_status),
-        })
+            category = str(stat.path.parent)
+            if category not in library_categories:
+                library_categories[category] = []
+            library_categories[category].append({
+                'path': str(stat.path),
+                'title': page_title_dict[stat.path],
+                'icon': _get_verification_status_icon(stat.verification_status),
+            })
 
     data: Dict[str, Any] = {}
     data['libraryCategories'] = []
@@ -144,12 +147,7 @@ def _render_source_code_stats_for_top_page(
             'name': category,
             'pages': pages,
         })
-    data['verificationCategories'] = []
-    for category, pages in verification_categories.items():
-        data['verificationCategories'].append({
-            'name': category,
-            'pages': pages,
-        })
+    data['verificationPages'] = verification_pages
     return data
 
 
