@@ -58,7 +58,7 @@ _CATEGORIES: List[Tuple[str, str]] = [
     ['include/emthrm/math/twelvefold_way/stirling_number', 'stirlingNumber'],
     ['include/emthrm/misc', 'misc'],
     ['include/emthrm/string', 'string'],
-    ['include/emthrm/util', 'util']
+    ['include/emthrm/util', 'util'],
 ]
 
 
