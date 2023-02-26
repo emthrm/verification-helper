@@ -76,7 +76,7 @@ class TestDocsSubcommand(unittest.TestCase):
             pathlib.Path('docs', 'x', 'y', 'multiple-pathes.md'): textwrap.dedent(f"""\
                 ---
                 title: [
-                  multiple pathes 1
+                  multiple pathes 1,
                   multiple pathes 2
                 ]
                 documentation_of: [

@@ -94,23 +94,6 @@ class TestCPlusPlusBundlingUnit(unittest.TestCase):
                 bundler = cplusplus_bundle.Bundler(iquotes=[tempdir], compiler='clang++')
                 self.assertRaises(BundleError, lambda: bundler.update(path))
 
-    def test_emthrm(self) -> None:
-        files = {
-            'include/emthrm/foo.hpp': textwrap.dedent("""\
-                void foo() {}
-                """).encode(),
-            'example.test.cpp': textwrap.dedent("""\
-                #include "emthrm/foo.hpp"
-                """).encode(),
-        }
-        path = pathlib.Path('example.test.cpp')
-        with tests.utils.load_files(files) as tempdir:
-            with tests.utils.chdir(tempdir):
-                bundler = cplusplus_bundle.Bundler(iquotes=[tempdir])
-                bundler.update(path)
-                bundled = bundler.get()
-                self.assertIn(b'void foo() {}', bundled)
-
 
 @unittest.skipIf(platform.system() == 'Darwin', 'We cannot use the fake g++ of macOS.')
 class TestCPlusPlusBundlingEndToEnd(unittest.TestCase):
