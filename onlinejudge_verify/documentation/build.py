@@ -25,6 +25,7 @@ _COPIED_STATIC_FILE_PATHS: List[str] = [
     '_includes/mathjax.html',
     '_includes/theme_fix.html',
     '_includes/highlight.html',
+    '_includes/item.html',
     '_includes/document_header.html',
     '_includes/document_body.html',
     '_includes/document_footer.html',
