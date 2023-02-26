@@ -69,7 +69,6 @@ class VerificationMarker:
         path = path.resolve(strict=True).relative_to(_cwd())
         if path not in self.verification_statuses:
             # verifiedの場合は必ずself.verification_status[path] == 'verified'となるのでこのifの中には入らない
-            # それ以外の場合は「そもそもテストを実行していない」可能性もあるが一旦はfailedとみなす
             return True
         return self.verification_statuses[path] == 'failed'
 
@@ -78,6 +77,12 @@ class VerificationMarker:
             return
         path = path.resolve(strict=True).relative_to(_cwd())
         self.verification_statuses[path] = 'failed'
+
+    def mark_ignored(self, path: pathlib.Path) -> None:
+        if not path.exists():
+            return
+        path = path.resolve(strict=True).relative_to(_cwd())
+        self.verification_statuses[path] = 'ignored'
 
     def load_timestamps(self, *, jobs: Optional[int] = None) -> None:
         # 古いものを読み込む
