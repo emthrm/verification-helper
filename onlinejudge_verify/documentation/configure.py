@@ -256,24 +256,44 @@ def convert_to_page_render_jobs(*, source_code_stats: List[SourceCodeStat], mark
         front_matter, content = onlinejudge_verify.documentation.front_matter.split_front_matter(content)
 
         # move the location if documentation_of field exists
-        path = markdown_relative_path
-        documentation_of = front_matter.get(FrontMatterItem.documentation_of.value)
-        if documentation_of is not None:
-            documentation_of_path = resolve_documentation_of(documentation_of, markdown_path=path, basedir=basedir)
-            if documentation_of_path is None:
-                logger.warning('the `documentation_of` path of %s is not found: %s', str(path), documentation_of)
-                del front_matter[FrontMatterItem.documentation_of.value]
+        documentation_ofs = front_matter.get(FrontMatterItem.documentation_of.value)
+        if documentation_ofs is not None:
+            # documentation_of がリストのときも対応する
+            titles = front_matter.get(FrontMatterItem.title.value)
+            if type(documentation_ofs) is str:
+                if type(titles) is not str:
+                    logger.warning('the title of %s must be str: %s', str(path), str(titles))
+                    continue
+                front_matter[FrontMatterItem.documentation_of.value] = documentation_ofs = [documentation_ofs]
+                front_matter[FrontMatterItem.title.value] = titles = [titles]
+            if type(documentation_ofs) is not list or \
+               type(titles) is not list or \
+               len(documentation_ofs) != len(titles):
+                logger.warning('`title` and `documentation_of` do not match: %s, %s', str(titles), str(documentation_ofs))
                 continue
-            documentation_of_relative_path = documentation_of_path.resolve().relative_to(basedir)
-            front_matter[FrontMatterItem.documentation_of.value] = str(documentation_of_relative_path)
-            path = documentation_of_relative_path.parent / (documentation_of_path.name + '.md')
-
-        job = PageRenderJob(
-            path=path,
-            front_matter=front_matter,
-            content=content,
-        )
-        page_render_jobs[job.path] = job
+            for title, documentation_of in zip(titles, documentation_ofs):
+                documentation_of_path = resolve_documentation_of(documentation_of, markdown_path=markdown_relative_path, basedir=basedir)
+                if documentation_of_path is None:
+                    logger.warning('the `documentation_of` path of %s is not found: %s', str(path), documentation_of)
+                    continue
+                documentation_of_relative_path = documentation_of_path.resolve().relative_to(basedir)
+                path = documentation_of_relative_path.parent / (documentation_of_path.name + '.md')
+                job = PageRenderJob(
+                    path=path,
+                    front_matter={
+                        FrontMatterItem.title.value: str(title),
+                        FrontMatterItem.documentation_of.value: str(documentation_of_relative_path)
+                    },
+                    content=content,
+                )
+                page_render_jobs[job.path] = job
+        else:
+            job = PageRenderJob(
+                path=markdown_relative_path,
+                front_matter=front_matter,
+                content=content,
+            )
+            page_render_jobs[job.path] = job
 
     # API pages
     for stat in source_code_stats:
