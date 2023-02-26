@@ -262,7 +262,7 @@ def convert_to_page_render_jobs(*, source_code_stats: List[SourceCodeStat], mark
             titles = front_matter.get(FrontMatterItem.title.value)
             if isinstance(documentation_ofs, str):
                 if not isinstance(titles, str):
-                    logger.warning('the title of %s must be str: %s', str(path), str(titles))
+                    logger.warning('the title of %s must be str: %s', str(markdown_relative_path), str(titles))
                     continue
                 front_matter[FrontMatterItem.documentation_of.value] = documentation_ofs = [documentation_ofs]
                 front_matter[FrontMatterItem.title.value] = titles = [titles]
@@ -274,7 +274,7 @@ def convert_to_page_render_jobs(*, source_code_stats: List[SourceCodeStat], mark
             for title, documentation_of in zip(titles, documentation_ofs):
                 documentation_of_path = resolve_documentation_of(documentation_of, markdown_path=markdown_relative_path, basedir=basedir)
                 if documentation_of_path is None:
-                    logger.warning('the `documentation_of` path of %s is not found: %s', str(path), documentation_of)
+                    logger.warning('the `documentation_of` path of %s is not found: %s', str(markdown_relative_path), documentation_of)
                     continue
                 documentation_of_relative_path = documentation_of_path.resolve().relative_to(basedir)
                 path = documentation_of_relative_path.parent / (documentation_of_path.name + '.md')
